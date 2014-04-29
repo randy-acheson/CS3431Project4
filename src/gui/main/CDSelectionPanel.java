@@ -1,5 +1,6 @@
 package gui.main;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +17,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import controllers.CDController;
+import controllers.ViewEventController;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.font.TextAttribute;
 
 public class CDSelectionPanel extends JPanel {
@@ -37,6 +41,7 @@ public class CDSelectionPanel extends JPanel {
 	DefaultListModel<String> listAlbumModel;
 
 	private JButton btnCheckOut;
+	private JButton btnAddToWish;
 	private JLabel lblGenres;
 	private JLabel lblArtists;
 	private JLabel lblAlbums;
@@ -60,6 +65,7 @@ public class CDSelectionPanel extends JPanel {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				btnCheckOut.setEnabled(false);
+				btnAddToWish.setEnabled(false);
 				listArtistModel.removeAllElements();
 				setArtist(listGenre.getSelectedValue());
 			}
@@ -69,6 +75,7 @@ public class CDSelectionPanel extends JPanel {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				btnCheckOut.setEnabled(false);
+				btnAddToWish.setEnabled(false);
 				listAlbumModel.removeAllElements();
 				setAlbum(listArtist.getSelectedValue());
 			}
@@ -78,11 +85,20 @@ public class CDSelectionPanel extends JPanel {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
+					if (!ViewEventController.getInstance().isInWishList(listAlbum.getSelectedValue())) {
+						btnAddToWish.setEnabled(true);
+					}
 					btnCheckOut.setEnabled(true);
 				}
 			}
 		});
-
+		
+		btnAddToWish.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	ViewEventController.getInstance().getWishListPanel().addCD(listAlbum.getSelectedValue());
+            	btnAddToWish.setEnabled(false);
+            }
+		});
 	}
 
 	protected void setGenres() {
@@ -112,9 +128,8 @@ public class CDSelectionPanel extends JPanel {
 
 	protected void makeConstraints(String user) {
 
-		String welcomeUser = new String ("Welcome " + user + "!");
-
-		btnCheckOut = new JButton("(Check Out)");		
+		btnCheckOut = new JButton("(Check Out)");	
+		btnAddToWish = new JButton("Add to Wish List");	
 
 		listGenreModel = new DefaultListModel<String>();
 		listArtistModel = new DefaultListModel<String>();
@@ -169,6 +184,13 @@ public class CDSelectionPanel extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, btnCheckOut, 0, SpringLayout.EAST, this);
 		btnCheckOut.setEnabled(false);
 
+		springLayout.putConstraint(SpringLayout.WEST, btnAddToWish, 10, SpringLayout.WEST, this);
+		springLayout.putConstraint(SpringLayout.SOUTH, btnAddToWish, 0, SpringLayout.SOUTH, btnCheckOut);
+		btnAddToWish.setEnabled(false);
+		if (user.equals(" ")) {
+			btnAddToWish.setVisible(false);
+		}
+
 		springLayout.putConstraint(SpringLayout.WEST, lblGenres, 10, SpringLayout.WEST, this);
 		springLayout.putConstraint(SpringLayout.SOUTH, lblGenres, -6, SpringLayout.NORTH, listScrollerGenre);
 		lblGenres.setFont(font.deriveFont(attributes));
@@ -188,5 +210,7 @@ public class CDSelectionPanel extends JPanel {
 		add(lblGenres);
 		add(lblArtists);
 		add(lblAlbums);
+		add(btnAddToWish);
 	}
+
 }

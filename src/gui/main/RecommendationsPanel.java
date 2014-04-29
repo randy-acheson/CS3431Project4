@@ -2,9 +2,10 @@ package gui.main;
 
 import gui.login.User;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import controllers.CDController;
+import controllers.ViewEventController;
 
 public class RecommendationsPanel extends JPanel {
 	
@@ -38,6 +40,7 @@ public class RecommendationsPanel extends JPanel {
 	JLabel lblArtistText;
 	JLabel lblAlbumText;
 	private JButton btnCheckOut;
+	private JButton btnAddToWish;
 
 	public RecommendationsPanel(String user) {
 		springLayout = new SpringLayout();
@@ -113,17 +116,34 @@ public class RecommendationsPanel extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, btnCheckOut, 0, SpringLayout.EAST, this);
 		btnCheckOut.setEnabled(false);
 		add(btnCheckOut);
+		
+		btnAddToWish = new JButton("Add to Wish List");
+		springLayout.putConstraint(SpringLayout.NORTH, btnAddToWish, 0, SpringLayout.NORTH, btnCheckOut);
+		springLayout.putConstraint(SpringLayout.EAST, btnAddToWish, -6, SpringLayout.WEST, btnCheckOut);
+		btnAddToWish.setEnabled(false);
+		add(btnAddToWish);
 
 		
 		listRecommendations.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				CD cd = findCD(listRecommendations.getSelectedValue().toString());
+				btnAddToWish.setEnabled(false);
 				lblGenreText.setText(cd.getGenre());
 				lblArtistText.setText(cd.getArtist());
 				lblAlbumText.setText(cd.getAlbum());
 				btnCheckOut.setEnabled(true);
+				if (!ViewEventController.getInstance().isInWishList(listRecommendations.getSelectedValue())) {
+					btnAddToWish.setEnabled(true);
+				}
 			}
+		});
+		
+		btnAddToWish.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	ViewEventController.getInstance().getWishListPanel().addCD(listRecommendations.getSelectedValue());
+            	btnAddToWish.setEnabled(false);
+            }
 		});
 	}
 

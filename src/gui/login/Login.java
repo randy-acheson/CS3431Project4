@@ -135,9 +135,7 @@ public class Login extends JFrame {
 		
 		
 		btnLogin.addActionListener(new ActionListener() {
-			 
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
             	for (User user : users) {
             		if (((txtLoginUsername.getText()).equals(user.getName())) && ((txtLoginPassword.getText()).equals(user.getPassword()))) {
             			MainCDFrame mainPage = new MainCDFrame(user.getName());
